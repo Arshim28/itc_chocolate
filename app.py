@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 from plotly.offline import plot
@@ -46,24 +45,24 @@ filtered_df = df[
 
 filtered_df = filtered_df.reset_index(drop=True)
 
-top_5_compositions = []
+top_10_compositions = []
 for i in range(len(filtered_df)):
     if filtered_df['SFC & Temperature'][i][idx][1] == temp:
         #Round the composition, sfc and temperature values to 2 decimal places
         filtered_df['Composition'][i] = tuple([round(x, 2) for x in filtered_df['Composition'][i]])
         filtered_df['SFC & Temperature'][i][idx] = tuple([round(x, 2) for x in filtered_df['SFC & Temperature'][i][idx]])
 
-        top_5_compositions.append((filtered_df['Composition'][i], filtered_df['SFC & Temperature'][i][idx][0]))
+        top_10_compositions.append((filtered_df['Composition'][i], filtered_df['SFC & Temperature'][i][idx][0]))
 
-top_5_compositions = sorted(top_5_compositions, key=lambda x: x[1], reverse=True)
-top_5_compositions = top_5_compositions[:5]
+top_10_compositions = sorted(top_10_compositions, key=lambda x: x[1], reverse=True)
+top_10_compositions = top_10_compositions[:10]
 
 
 
 sfc, tmp = [[] for _ in range(10)], [[] for _ in range(10)]
 
-for i in range(5):
-    composition = top_5_compositions[i][0]
+for i in range(10):
+    composition = top_10_compositions[i][0]
     idx = 0
     for j in range(len(filtered_df)):
         if filtered_df['Composition'][j] == composition:
@@ -76,9 +75,9 @@ for i in range(5):
 fig = go.Figure()
 
 for i in range(10):
-    fig.add_trace(go.Scatter(x=tmp[i], y=sfc[i], mode='lines', name=f"Comp {i+1}: POP={top_5_compositions[i][0][0]}, SOS={top_5_compositions[i][0][2]}"))
+    fig.add_trace(go.Scatter(x=tmp[i], y=sfc[i], mode='lines', name=f"Comp {i+1}: POP={top_10_compositions[i][0][0]}, SOS={top_10_compositions[i][0][2]}"))
 
-fig.update_layout(title='Top 5 combinations', xaxis_title='Temperature', yaxis_title='SFC')
+fig.update_layout(title='Top 10 compositions with closest temperature to 35C', xaxis_title='Temperature', yaxis_title='SFC')
 #Make the plot size bigger
 fig.update_layout(
     autosize=False,
